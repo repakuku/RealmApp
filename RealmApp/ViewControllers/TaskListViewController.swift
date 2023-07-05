@@ -88,7 +88,12 @@ final class TaskListViewController: UITableViewController {
     }
 
     @IBAction func sortingList(_ sender: UISegmentedControl) {
-        
+        if sender.selectedSegmentIndex == 0 {
+            taskLists = storageManager.realm.objects(TaskList.self).sorted(byKeyPath: "date")
+        } else {
+            taskLists = storageManager.realm.objects(TaskList.self).sorted(byKeyPath: "title")
+        }
+        tableView.reloadData()
     }
     
     @objc private func  addButtonPressed() {
