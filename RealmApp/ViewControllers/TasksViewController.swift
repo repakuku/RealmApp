@@ -32,7 +32,7 @@ final class TasksViewController: UITableViewController {
         completedTasks = taskList.tasks.filter("isComplete = true")
     }
     
-    // MARK: - Table view data source
+    // MARK: - UITableViewDataSource
     override func numberOfSections(in tableView: UITableView) -> Int {
         2
     }
@@ -58,7 +58,42 @@ final class TasksViewController: UITableViewController {
     @objc private func addButtonPressed() {
         showAlert()
     }
-
+    
+    // MARK: - UITableViewDelegate
+    override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        var taskList: Results<Task>!
+        
+        if indexPath.section == 0 {
+            taskList = currentTasks
+        } else {
+            taskList = completedTasks
+        }
+        let task = taskList[indexPath.row]
+        
+        let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { [unowned self] _, _, _ in
+            storageManager.delete(task)
+            tableView.deleteRows(at: [indexPath], with: .automatic)
+            }
+        
+        let editAction = UIContextualAction(style: .normal, title: "Edit") { _, _, isDone in
+            // edit task
+            
+            isDone(true)
+        }
+        
+        let doneAction = UIContextualAction(style: .normal, title: "Done") { _, _, isDone in
+            // done task
+            
+            isDone(true)
+        }
+        
+        let swipeActionsConfiguration = UISwipeActionsConfiguration(actions: [doneAction, editAction, deleteAction])
+        
+        doneAction.backgroundColor = .systemGreen
+        editAction.backgroundColor = .systemOrange
+        
+        return swipeActionsConfiguration
+    }
 }
 
 extension TasksViewController {
