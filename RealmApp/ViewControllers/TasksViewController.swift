@@ -60,6 +60,10 @@ final class TasksViewController: UITableViewController {
     }
     
     // MARK: - UITableViewDelegate
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         var taskList: Results<Task>!
         
@@ -68,6 +72,7 @@ final class TasksViewController: UITableViewController {
         } else {
             taskList = completedTasks
         }
+        
         let task = taskList[indexPath.row]
         
         let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { [unowned self] _, _, _ in
@@ -83,18 +88,25 @@ final class TasksViewController: UITableViewController {
             isDone(true)
         }
         
-        let doneAction = UIContextualAction(style: .normal, title: "Done") { _, _, isDone in
-            // done task
+        let doneActonTitle = task.isComplete ? "Undone" : "Done"
+        let doneAction = UIContextualAction(style: .normal, title: doneActonTitle) { [unowned self] _, _, isDone in
+            storageManager.done(task)
+            
+            let sourceIndexPath = indexPath
+            
+            let row = task.isComplete ? completedTasks.count - 1 : currentTasks.count - 1
+            let section = task.isComplete ? 1 : 0
+            let destinationIndexPath = IndexPath(row: row, section: section)
+            
+            tableView.moveRow(at: sourceIndexPath, to: destinationIndexPath)
             
             isDone(true)
         }
         
-        let swipeActionsConfiguration = UISwipeActionsConfiguration(actions: [doneAction, editAction, deleteAction])
+        editAction.backgroundColor = .orange
+        doneAction.backgroundColor = #colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1)
         
-        doneAction.backgroundColor = .systemGreen
-        editAction.backgroundColor = .systemOrange
-        
-        return swipeActionsConfiguration
+        return UISwipeActionsConfiguration(actions: [doneAction, editAction, deleteAction])
     }
 }
 
