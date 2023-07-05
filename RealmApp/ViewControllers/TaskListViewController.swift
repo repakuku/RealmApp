@@ -47,9 +47,7 @@ final class TaskListViewController: UITableViewController {
         let taskList = taskLists[indexPath.row]
         content.text = taskList.title
         
-        let areAllTasksComplete = taskList.tasks.contains { !$0.isComplete }
-        
-        if taskList.tasks.count == 0 || areAllTasksComplete {
+        if taskList.tasks.count == 0 || taskList.tasks.contains(where: { !$0.isComplete }) {
             content.secondaryText = "\(taskList.tasks.count)"
         } else  if taskList.tasks.count > 0 {
             let attachment = NSTextAttachment()
@@ -79,13 +77,18 @@ final class TaskListViewController: UITableViewController {
             isDone(true)
         }
         
+        editAction.backgroundColor = .orange
+        
+        if !taskList.tasks.contains(where: { !$0.isComplete } ) {
+            return UISwipeActionsConfiguration(actions: [editAction, deleteAction])
+        }
+        
         let doneAction = UIContextualAction(style: .normal, title: "Done") { [unowned self] _, _, isDone in
             storageManager.done(taskList)
             tableView.reloadRows(at: [indexPath], with: .automatic)
             isDone(true)
         }
         
-        editAction.backgroundColor = .orange
         doneAction.backgroundColor = #colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1)
         
         return UISwipeActionsConfiguration(actions: [doneAction, editAction, deleteAction])
