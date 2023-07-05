@@ -46,7 +46,19 @@ final class TaskListViewController: UITableViewController {
         var content = cell.defaultContentConfiguration()
         let taskList = taskLists[indexPath.row]
         content.text = taskList.title
-        content.secondaryText = "\(taskList.tasks.count)"
+        
+        let areAllTasksComplete = taskList.tasks.contains { !$0.isComplete }
+        
+        if taskList.tasks.count == 0 || areAllTasksComplete {
+            content.secondaryText = "\(taskList.tasks.count)"
+        } else  if taskList.tasks.count > 0 {
+            let attachment = NSTextAttachment()
+            let checkmarkImage = UIImage(systemName: "checkmark")?.withTintColor(.systemBlue)
+            attachment.image = checkmarkImage
+            let checkmarkString = NSMutableAttributedString(attachment: attachment)
+            content.secondaryAttributedText = checkmarkString
+        }
+        
         cell.contentConfiguration = content
         return cell
     }
