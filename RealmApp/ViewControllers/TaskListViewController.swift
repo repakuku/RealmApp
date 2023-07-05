@@ -105,7 +105,15 @@ final class TaskListViewController: UITableViewController {
         } else {
             taskLists = storageManager.realm.objects(TaskList.self).sorted(byKeyPath: "title")
         }
-        tableView.reloadData()
+        
+        var indexPaths: [IndexPath] = []
+        
+        for index in 0..<taskLists.count {
+            let indexPath = IndexPath(row: index, section: 0)
+            indexPaths.append(indexPath)
+        }
+        
+        tableView.reloadRows(at: indexPaths, with: .automatic)
     }
     
     @objc private func  addButtonPressed() {
