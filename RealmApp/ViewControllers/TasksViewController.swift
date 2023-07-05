@@ -75,8 +75,10 @@ final class TasksViewController: UITableViewController {
             tableView.deleteRows(at: [indexPath], with: .automatic)
             }
         
-        let editAction = UIContextualAction(style: .normal, title: "Edit") { _, _, isDone in
-            // edit task
+        let editAction = UIContextualAction(style: .normal, title: "Edit") { [unowned self] _, _, isDone in
+            showAlert(with: task) {
+                tableView.reloadRows(at: [indexPath], with: .automatic)
+            }
             
             isDone(true)
         }
@@ -110,7 +112,8 @@ extension TasksViewController {
                    style: .default
                ) { [weak self] taskTitle, taskNote in
                    if let task, let completion {
-                       // TODO: - edit task
+                       self?.storageManager.edit(task, newTitle: taskTitle, newNote: taskNote)
+                       completion()
                        return
                    }
                    self?.save(task: taskTitle, withNote: taskNote)
